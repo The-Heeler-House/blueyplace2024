@@ -2,7 +2,7 @@
   "name": "r/place MLP Minimap",
   "author": "r/place MLP Minimap Authors",
   "description": "Minimap overlay and automatic selection of pixel + color for r/place",
-  "namespace": "https://place.equestria.dev/",
+  "namespace": "https://place.equestria.horse/",
   "grant": [
     "GM.xmlHttpRequest",
     "GM.getValue",
@@ -11,7 +11,7 @@
   "include": [
     "https://hot-potato.reddit.com/embed*",
     "https://garlic-bread.reddit.com/embed*",
-    "https://place.equestria.dev/embed*"
+    "https://place.equestria.horse/embed*"
   ],
   "downloadURL": "http://ponyplace-cdn.ferrictorus.com/loader.user.js",
   "updateURL": "http://ponyplace-cdn.ferrictorus.com/loader.user.js",
