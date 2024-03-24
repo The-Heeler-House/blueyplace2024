@@ -1,7 +1,7 @@
 Hablas Espanol? [Lee esto en su lugar](README.es.md)
 
 ### Important notice!
-This repository is being used to develop additional features for the overlay **in case r/place returns**. Right now evidence of return is non-existent (in fact, there's evidence *against* it reoccurring), but we like to be prepared :p
+This repository is being used to develop additional features for the overlay assuming that r/place will return in June 2024. r/place on AFD is essentially confirmed to not be happening, so this repository as-is currently is not functional.
 
 # /r/place 2024 collaborative minimap userscript
 Help [/r/MyLittlePony](https://reddit.com/r/mylittlepony) get a pony on /r/place!
