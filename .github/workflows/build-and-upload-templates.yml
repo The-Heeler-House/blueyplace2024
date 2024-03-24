@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - "main"
+      - "events/lemmy/2023"
     paths:
       - "templates/*/autopick*.png"
       - "templates/*/canvas*.png"
@@ -15,6 +16,7 @@ on:
       - "templates/*/mask*.png"
       - "templates/*/template.json"
       - "templates/*/version.txt"
+      - "templates/*/sources/*.png"
 
 permissions:
   contents: read
@@ -38,7 +40,7 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         if [ -f ./.build/template_assembler/requirements.txt ]; then pip install -r ./.build/template_assembler/requirements.txt; fi
-        buildTemplates="mlp mlp_alliance mlp_world" # "mlp r-ainbowroad spain"
+        buildTemplates="mlp" # "mlp r-ainbowroad spain"
         for buildTemplate in $buildTemplates; do
             python3 .build/template_assembler/assemble_template.py templates/$buildTemplate
         done
