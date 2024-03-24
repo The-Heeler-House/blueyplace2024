@@ -13,14 +13,13 @@
     "https://garlic-bread.reddit.com/embed*",
     "https://place.equestria.horse/embed*"
   ],
-  "downloadURL": "http://ponyplace-cdn.ferrictorus.com/loader.user.js",
-  "updateURL": "http://ponyplace-cdn.ferrictorus.com/loader.user.js",
+  "downloadURL": "https://ponyplace-cdn.equestria.horse/loader.user.js",
+  "updateURL": "https://ponyplace-cdn.equestria.horse/loader.user.js",
   "connect": [
     "raw.githubusercontent.com",
     "media.githubusercontent.com",
-    "ponyplace.z19.web.core.windows.net",
-    "ponyplace-cdn.ferrictorus.com",
-    "ponyplace-compute.ferrictorus.com"
+    "ponyplace-cdn.equestria.horse",
+    "ponyplace-cdn.equestria.horse"
   ],
   "version": "0.0.2"
 }

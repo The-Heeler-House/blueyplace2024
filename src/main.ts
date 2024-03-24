@@ -18,12 +18,12 @@ import {Minimap} from './minimap/minimap';
 const autoPickAfterPlaceTimeout = 3000;
 
 (async function () {
-  const analytics = new Analytics(new URL('http://ponyplace-compute.ferrictorus.com/analytics/placepixel'));
+  const analytics = new Analytics(new URL('https://ponyplace-compute.equestria.horse/analytics/placepixel'));
   const analyticsLogger = new AnalyticsLogger(analytics);
 
   const minimap = new Minimap(analyticsLogger);
 
-  const blobServer = new BlobServer("https://ponyplace.z19.web.core.windows.net");
+  const blobServer = new BlobServer("https://ponyplace.cdn.equestria.horse/");
   //minimap.templates.add("mlp_alliance", blobServer.getTemplate("mlp_alliance", {autoPick: true, mask: true}));
   //minimap.templates.add("mlp_world", blobServer.getTemplate("mlp_world", {autoPick: true, mask: true}));
   minimap.templates.add("mlp", blobServer.getTemplate("mlp", {autoPick: true, mask: true}));
