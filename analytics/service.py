@@ -2,16 +2,17 @@ import flask
 import json
 import datetime
 import pg8000.native
+import secrets
 
 app = flask.Flask(__name__)
 
 class database:
     def __init__(self):
         self.db = pg8000.native.Connection(
-            user="writer",
-            host="host",
-            database="ponyplace_analytics",
-            password="lol",
+            user=secrets.pg_user,
+            host=secrets.pg_host,
+            database=secrets.pg_database,
+            password=secrets.pg_password,
             ssl_context=True)
 
     def logPixel(self, timestamp, template, json):

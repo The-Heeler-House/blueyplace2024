@@ -3,6 +3,7 @@
 
 # Python
 /venv/
+/analytics/secrets.py
 
 # Ignore krita autosave files becaue they are bugging me
 *-autosave.kra
