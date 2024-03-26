@@ -80,7 +80,10 @@ jobs:
           [minio]
           type = s3
           provider = Minio
-          env_auth = true
+          env_auth = false
+          access_key_id = ${{ secrets.RCLONE_CONFIG_MINIO_ACCESS_KEY_ID }}
+          secret_access_key = ${{ secrets.RCLONE_CONFIG_MINIO_SECRET_ACCESS_KEY }}
+          endpoint = ${{ secrets.RCLONE_CONFIG_MINIO_ENDPOINT }}
           region = us-east-1
         disable_base64: true
 
