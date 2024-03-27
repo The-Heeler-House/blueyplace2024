@@ -13,8 +13,8 @@
     "https://garlic-bread.reddit.com/embed*",
     "https://place.equestria.horse/embed*"
   ],
-  "downloadURL": "https://ponyplace-cdn.equestria.horse/loader.user.js",
-  "updateURL": "https://ponyplace-cdn.equestria.horse/loader.user.js",
+  "downloadURL": "https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js",
+  "updateURL": "https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js",
   "connect": [
     "raw.githubusercontent.com",
     "media.githubusercontent.com",

@@ -13,7 +13,7 @@
 import {constants} from "./constants";
 import {gm_fetch, headerStringToObject} from "./utils";
 
-const url = "https://ponyplace-cdn.equestria.horse/minimap.user.js";
+const url = "https://ponyplace-cdn.equestria.horse/ponyplace/minimap.user.js";
 
 (async function () {
   let etag: string | undefined;
