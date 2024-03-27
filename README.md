@@ -22,7 +22,7 @@ You can install the userscript to help! You just need a browser (Chrome or Edge 
 
 * Install Tampermonkey (https://www.tampermonkey.net/)
   * Android folks can use Kiwi Browser + Tampermonkey.
-* Open the following page in your browser: <https://ponyplace-cdn.equestria.horse/loader.user.js>
+* Open the following page in your browser: <https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js>
   * This will invite you to install the userscript.
 * Visit /r/place and click on the canvas to get it to load.
 * Cycle to your template, if necessary, by clicking on the "Template: ..." setting.
