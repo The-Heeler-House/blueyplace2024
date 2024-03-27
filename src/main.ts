@@ -14,6 +14,7 @@ import {BlobServer} from './utils';
 import {Analytics} from './analytics';
 import {AnalyticsLogger} from './logger';
 import {Minimap} from './minimap/minimap';
+import {Notifications} from "./notifications/notifications";
 
 const autoPickAfterPlaceTimeout = 3000;
 
@@ -23,12 +24,17 @@ const autoPickAfterPlaceTimeout = 3000;
 
   const minimap = new Minimap(analyticsLogger);
 
+  const notifications = new Notifications("wss://ponyplace-notifs.equestria.horse");
+
   const blobServer = new BlobServer("https://ponyplace-cdn.equestria.horse/ponyplace");
   //minimap.templates.add("mlp_alliance", blobServer.getTemplate("mlp_alliance", {autoPick: true, mask: true}));
   //minimap.templates.add("mlp_world", blobServer.getTemplate("mlp_world", {autoPick: true, mask: true}));
   minimap.templates.add("mlp", blobServer.getTemplate("mlp", {autoPick: true, mask: true}));
 
   if (!await minimap.initialize())
+    return;
+
+  if (!await notifications.initialize())
     return;
 
   minimap.templates.startUpdateLoop();

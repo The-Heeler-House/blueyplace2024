@@ -1,0 +1,26 @@
+{
+  "name": "ponyplace-notifications",
+  "version": "1.0.0",
+  "description": "Notifications backend for PonyPlace",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r-ainbowroad/2024-minimap.git"
+  },
+  "author": "See CONTRIBUTORS.md",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/r-ainbowroad/2024-minimap/issues"
+  },
+  "homepage": "https://github.com/r-ainbowroad/2024-minimap#readme",
+  "dependencies": {
+    "@types/node": "^20.11.30",
+    "discord.js": "^14.14.1",
+    "express": "^4.19.2",
+    "typescript": "^5.4.3",
+    "ws": "^8.16.0"
+  }
+}
