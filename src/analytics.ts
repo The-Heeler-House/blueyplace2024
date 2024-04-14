@@ -10,8 +10,6 @@
  *
  **/
 
-import {v4 as uuidv4} from 'uuid';
-
 function formatLog(...args) {
   const formattedArgs = args.map((arg) => {
     if (Array.isArray(arg)) {
@@ -28,11 +26,11 @@ function formatLog(...args) {
 
 export class Analytics {
   #endpoint: URL;
-  #uuid: uuidv4;
+  #uuid: string | null;
 
   constructor(endpoint: URL) {
     this.#endpoint = endpoint;
-    this.#uuid = uuidv4();
+    this.#uuid = localStorage.getItem("ponyplace-id") || null;
   }
 
   private send(data) {

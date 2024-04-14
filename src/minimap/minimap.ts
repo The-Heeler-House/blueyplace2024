@@ -68,8 +68,8 @@ export class Minimap {
   async initialize() {
     this.templates.set(this.templates.keys[0]);
 
-    await waitForDocumentLoad();
-    await waitMs(1000);
+    //await waitForDocumentLoad();
+    //await waitMs(1000);
     this.rPlace = await getRedditCanvas();
     if (!this.rPlace) {
       const canvas = getMostLikelyCanvas();
@@ -157,6 +157,14 @@ export class Minimap {
       })
     );
 
+    this.settings.addSetting(
+      "copyId",
+      new ButtonSetting("Copy user ID", () => {
+        navigator.clipboard.writeText(localStorage.getItem("ponyplace-id") ?? "No ID found");
+      })
+    );
+
+    // TODO: Replace with listener for MQTT
     this.templates.addEventListener("templateFetched", () => {
       const template = this.templates.currentTemplate.obj;
       template!.palettize(this.rPlace!.palette);

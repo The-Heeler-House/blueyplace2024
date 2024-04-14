@@ -1,6 +1,7 @@
 import {createNotificationsUI, NotificationLevel, NotificationsUi} from "./notifications-ui";
 import {waitForDocumentLoad} from "../canvas";
 import {waitMs} from "../utils";
+import {MqttMinimapClient} from "../mqttMinimapClient";
 
 /**
  *
@@ -15,10 +16,18 @@ import {waitMs} from "../utils";
  **/
 export class Notifications {
   ui: NotificationsUi | undefined = undefined;
-  ws: WebSocket;
+  mqtt: MqttMinimapClient;
 
-  constructor(wsURI: string) {
-    this.ws = new WebSocket(wsURI);
+  constructor(mqtt: MqttMinimapClient) {
+    this.mqtt = mqtt
+  }
+
+  private handleNotification(data: any) {
+    if (data.level === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no notification level.");
+    if (!["low","high","critical"].includes(data.level)) return this.addNotification(NotificationLevel.High, "Received a notification with an unknown notification level.");
+    if (data.text === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no text.");
+
+    this.addNotification(data.level as NotificationLevel, data.text);
   }
 
   addNotification(level: NotificationLevel, text: string) {
@@ -26,22 +35,9 @@ export class Notifications {
   }
 
   async initialize() {
-    await waitForDocumentLoad();
-    await waitMs(1000);
-
     this.ui = createNotificationsUI(document);
 
-    this.ws.onmessage = (message) => {
-      let data = JSON.parse(message.data);
-
-      if (data.ka === true) return;
-
-      if (data.level === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no notification level.");
-      if (!["low","high","critical"].includes(data.level)) return this.addNotification(NotificationLevel.High, "Received a notification with an unknown notification level.");
-      if (data.text === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no text.");
-
-      this.addNotification(data.level as NotificationLevel, data.text);
-    }
+    this.mqtt.subscribe("notifications", (data) => this.handleNotification(data));
 
     return true;
   }

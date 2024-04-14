@@ -235,7 +235,7 @@ export class CanvasComparer extends Emitter {
   setInterval(ms) {
     this.updateInterval = setInterval(() => {
       this.computeDiff();
-    }, ms);
+    }, ms) as unknown as number;
   }
 
   clearInterval() {

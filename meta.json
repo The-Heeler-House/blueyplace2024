@@ -6,20 +6,25 @@
   "grant": [
     "GM.xmlHttpRequest",
     "GM.getValue",
-    "GM.setValue"
+    "GM.setValue",
+    "GM.addElement"
   ],
   "include": [
     "https://hot-potato.reddit.com/embed*",
     "https://garlic-bread.reddit.com/embed*",
-    "https://place.equestria.horse/embed*"
+    "https://place.equestria.horse/embed*",
+    "https://reddit.com/r/place*",
+    "https://www.reddit.com/r/place*",
+    "https://place.equestria.horse/"
   ],
-  "downloadURL": "https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js",
-  "updateURL": "https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js",
+  "downloadURL": "https://cdn.minimap.brony.place/loader.user.js",
+  "updateURL": "https://cdn.minimap.brony.place/loader.user.js",
   "connect": [
     "raw.githubusercontent.com",
     "media.githubusercontent.com",
-    "ponyplace-cdn.equestria.horse",
-    "ponyplace-cdn.equestria.horse"
+    "cdn.minimap.brony.place",
+    "realtime.minimap.brony.place",
+    "api.minimap.brony.place"
   ],
   "version": "0.0.2"
 }

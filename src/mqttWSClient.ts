@@ -1,0 +1,107 @@
+/**
+ *
+ * Part of the MLP r/place Project, under the Apache License v2.0 or ISC.
+ * SPDX-License-Identifier: Apache-2.0 OR ISC
+ * SPDX-FileCopyrightText: Copyright CONTRIBUTORS.md
+ *
+ **
+ *
+ * @file WebSocket connection using MQTT protocol. This loads on reddit.com.
+ *
+ **/
+
+//import * as mqtt from "mqtt";
+import { MqttClient } from "mqtt";
+import {waitForDocumentLoad} from "./canvas";
+import {waitMs} from "./utils";
+
+export class MqttWSClient {
+  private active: boolean = false;
+  private url: string;
+  private client: MqttClient | null = null;
+
+  constructor(url: string) {
+    console.log("hello! i am seperate from the minimap!");
+    this.url = url;
+  }
+
+  async initiate() {
+    await waitForDocumentLoad();
+
+    // @ts-ignore
+    GM.addElement('script', {
+      src: 'https://unpkg.com/mqtt/dist/mqtt.min.js',
+      type: 'text/javascript'
+    });
+
+    await waitMs(100);
+
+    window.onmessage = (message) => {
+      console.log(message);
+      console.log("hey! listen!");
+      // Message format:
+      /*
+        {
+          action: "actionName",
+          payload: {}
+        }
+       */
+      if (message.data.action === undefined) return;
+      if (message.data.payload === undefined) return;
+
+      if (message.data.action === "open") {
+        if (message.data.payload.id === undefined) return;
+        console.log("received open");
+
+        // @ts-ignore
+        this.client = mqtt.connect(this.url, {
+          keepalive: 60,
+          reschedulePings: true,
+          protocolId: 'MQTT',
+          protocolVersion: 4,
+          reconnectPeriod: 1000,
+          connectTimeout: 30 * 1000,
+          clean: true,
+          clientId: message.data.payload.id ?? undefined,
+          username: "public",
+          password: "public"
+        });
+
+        this.client?.on("message", (topic, data) => {
+          try {
+            message.source.postMessage({
+              action: "event",
+              payload: {
+                topic,
+                data: JSON.parse(data.toString())
+              }
+            });
+          } catch (err: any) {
+            if (err.name === "SyntaxError") {
+              console.warn("Received subscribed event (" + topic + ") of which payload data is not JSON.\n" + data);
+            } else {
+              console.error(err);
+            }
+          }
+        });
+      }
+
+      if (message.data.action === "subscribe") {
+        if (message.data.payload.name === undefined) return;
+        this.client?.subscribe(message.data.payload.name);
+      }
+
+      if (message.data.action === "unsubscribe") {
+        if (message.data.payload.name === undefined) return;
+        this.client?.unsubscribe(message.data.payload.name);
+      }
+
+      if (message.data.action === "close") {
+        this.client?.removeAllListeners();
+        this.client?.end();
+      }
+    }
+
+    return true;
+  }
+}

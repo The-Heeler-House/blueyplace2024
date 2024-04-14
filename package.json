@@ -9,12 +9,14 @@
   },
   "dependencies": {
     "@types/greasemonkey": "^4.0.4",
+    "mqtt": "^5.5.2",
     "uhtml": "^3.1.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
+    "@types/uuid": "^9.0.8",
     "rollup": "^3.20.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "rollup-plugin-userscript-metablock": "^0.3.2"
