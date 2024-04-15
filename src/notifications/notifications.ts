@@ -1,6 +1,4 @@
 import {createNotificationsUI, NotificationLevel, NotificationsUi} from "./notifications-ui";
-import {waitForDocumentLoad} from "../canvas";
-import {waitMs} from "../utils";
 import {MqttMinimapClient} from "../mqttMinimapClient";
 
 /**
@@ -37,7 +35,7 @@ export class Notifications {
   async initialize() {
     this.ui = createNotificationsUI(document);
 
-    this.mqtt.subscribe("notifications", (data) => this.handleNotification(data));
+    this.mqtt.on("notifications", (data) => this.handleNotification(data));
 
     return true;
   }

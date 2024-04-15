@@ -47,13 +47,13 @@ const autoPickAfterPlaceTimeout = 3000;
     await waitForDocumentLoad();
     await waitMs(1000);
 
-    if (!await mqttClient.initiate())
-      return;
-
     if (!await minimap.initialize())
       return;
 
     if (!await notifications.initialize())
+      return;
+
+    if (!mqttClient.initiate("test"))
       return;
 
     minimap.templates.startUpdateLoop();

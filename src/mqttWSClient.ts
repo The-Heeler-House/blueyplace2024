@@ -16,7 +16,6 @@ import {waitForDocumentLoad} from "./canvas";
 import {waitMs} from "./utils";
 
 export class MqttWSClient {
-  private active: boolean = false;
   private url: string;
   private client: MqttClient | null = null;
 
@@ -66,14 +65,18 @@ export class MqttWSClient {
           username: "public",
           password: "public"
         });
+        
+        if (message.data.payload.topic !== undefined)
+          this.client?.subscribe(message.data.payload.topic);
 
-        this.client?.on("message", (topic, data) => {
+        this.client?.on("message", (topic, data, packet) => {
           try {
             message.source.postMessage({
               action: "event",
               payload: {
                 topic,
-                data: JSON.parse(data.toString())
+                data: JSON.parse(data.toString()),
+                retained: packet.retain ?? false
               }
             });
           } catch (err: any) {
