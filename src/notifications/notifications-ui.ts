@@ -51,6 +51,11 @@ mlpnotification.low {
   display: block;
 }
 
+.notification-date {
+    color: #959595 !important;
+    font-size: smaller;
+}
+
 .notification-closer {
   --button-color-background-active: rgba(0, 0, 0, 0);
   --button-color-background-activated: rgba(0, 0, 0, 0);
@@ -85,8 +90,10 @@ export class NotificationsUi {
     const notificationObject = document.createElement("mlpnotification");
     const closeButton = document.createElement("button");
     const notificationText = document.createElement("span");
+    const notificationDate = document.createElement("span");
 
     notificationObject.classList.add(level);
+    notificationObject.setAttribute("date", new Date().toISOString());
 
     closeButton.classList.add("notification-closer");
     closeButton.type = "button";
@@ -98,8 +105,11 @@ export class NotificationsUi {
     notificationText.classList.add("notification-text");
     notificationText.innerText = text;
 
+    notificationDate.classList.add("notification-date");
+
     notificationObject.appendChild(closeButton);
     notificationObject.appendChild(notificationText);
+    notificationObject.appendChild(notificationDate);
 
     this.mlpNotificationsBlock.appendChild(notificationObject);
   }
@@ -117,6 +127,28 @@ export function createNotificationsUI(document: Document): NotificationsUi {
   document.querySelector("body")?.appendChild(htmlObject);
 
   const mlpNotificationsBlock = htmlObject.querySelector("mlpnotifications")! as HTMLElement;
+
+  setInterval(() => {
+    for (let date of document.getElementsByClassName("notification-date")) {
+      let creationDate = Date.parse(date.parentElement?.getAttribute("date") as string)
+      let now = Date.now();
+
+      let timeSinceCreation = now - creationDate;
+
+      let seconds = Math.floor(timeSinceCreation / 1000);
+      let minutes = Math.floor(timeSinceCreation / 1000 / 60);
+
+      if (minutes >= 60) {
+        date.innerHTML = new Date(date.parentElement?.getAttribute("date") as string).toString();
+      } else {
+        if (seconds >= 60) {
+          date.innerHTML = `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+        } else {
+          date.innerHTML = `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
+        }
+      }
+    }
+  },1000);
 
   return new NotificationsUi(mlpNotificationsBlock);
 }
