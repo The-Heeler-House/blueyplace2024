@@ -14,10 +14,10 @@ import {MqttMinimapClient} from "../mqttMinimapClient";
  **/
 export class Notifications {
   ui: NotificationsUi | undefined = undefined;
-  mqtt: MqttMinimapClient;
+  realtime: MqttMinimapClient;
 
   constructor(mqtt: MqttMinimapClient) {
-    this.mqtt = mqtt
+    this.realtime = mqtt
   }
 
   private handleNotification(data: any) {
@@ -35,7 +35,7 @@ export class Notifications {
   async initialize() {
     this.ui = createNotificationsUI(document);
 
-    this.mqtt.on("notifications", (data) => this.handleNotification(data));
+    this.realtime.on("notifications", (data) => this.handleNotification(data));
 
     return true;
   }
