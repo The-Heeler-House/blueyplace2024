@@ -12,8 +12,8 @@
 
 //import * as mqtt from "mqtt";
 import { MqttClient } from "mqtt";
-import {waitForDocumentLoad} from "./canvas";
-import {waitMs} from "./utils";
+import {waitForDocumentLoad} from "../canvas";
+import {waitMs} from "../utils";
 
 export class MqttWSClient {
   private url: string;
@@ -61,9 +61,7 @@ export class MqttWSClient {
           reconnectPeriod: 1000,
           connectTimeout: 30 * 1000,
           clean: true,
-          clientId: message.data.payload.id ?? undefined,
-          username: "public",
-          password: "public"
+          clientId: message.data.payload.id ?? undefined
         });
         
         if (message.data.payload.topic !== undefined)

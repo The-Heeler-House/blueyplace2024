@@ -9,12 +9,13 @@
  * @file WebSocket connection using MQTT protocol. This loads on reddit.com.
  *
  **/
+import EventEmitter from "../EventEmitter";
 
-export class MqttMinimapClient {
+export class MqttMinimapClient extends EventEmitter {
   faction: string = "";
-  listeners: { [key: string]: any } = {};
 
   constructor() {
+    super();
     console.log("hello! i am part of the minimap!");
 
     window.onmessage = (message) => this.processMessage(message);
@@ -32,9 +33,9 @@ export class MqttMinimapClient {
       if (topic[0] !== "templates") return;
       if (topic[1] !== this.faction) return console.warn(`Received subscribed message from faction ${topic[1]} but current faction is ${this.faction}!`);
 
-      if (!this.listeners.hasOwnProperty(topic[2])) return;
+      console.debug(`Received event update from ${topic.join("/")}: ${message.data.payload.data} retained: ${message.data.payload.retained}`);
 
-      this.listeners[topic[2]](message.data.payload.data, message.data.payload.retained);
+      this.emit(topic[2], message.data.payload.data, message.data.payload.retained);
     }
   }
 
@@ -44,23 +45,6 @@ export class MqttMinimapClient {
     console.log(`PonyPlace switching from ${this.faction} to ${faction}`);
     this.subscribe(`templates/${faction}/#`);
     this.faction = faction;
-  }
-
-  /**
-   * Creates a listener for a specific topic which persists between faction changes.
-   * @param topic
-   * @param callback
-   */
-  on(topic: string, callback: any) {
-    this.listeners[topic] = callback;
-  }
-
-  /**
-   * Removes a listener for a specific topic.
-   * @param topic
-   */
-  off(topic: string) {
-    delete this.listeners[topic];
   }
 
   private subscribe(topic: string) {
@@ -81,8 +65,6 @@ export class MqttMinimapClient {
    * Closes the MQTT connection and destroys all listeners.
    */
   close() {
-    this.listeners = {};
-
     window.parent.postMessage({
       action: "close",
       payload: {}
@@ -97,7 +79,7 @@ export class MqttMinimapClient {
     console.log("awaken!");
     window.parent.postMessage({
       action: "open",
-      payload: { id: localStorage.getItem("ponyplace-id"), topic: `templates/${faction}/#` }
+      payload: { id: localStorage.getItem("ponyplace-id"), topic: faction ? `templates/${faction}/#` : undefined }
     });
 
     this.faction = faction;
