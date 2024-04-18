@@ -104,9 +104,6 @@ export class TemplateController extends EventEmitter {
       responseType: "arraybuffer",
       url
     });
-    
-    console.log(url);
-    console.log(resp);
 
     if (resp.status != 200)
       throw new HTTPResponseError(resp.status, resp.statusText);
@@ -124,7 +121,7 @@ export class TemplateController extends EventEmitter {
     return this.fetchImage(this.getBaseURL(faction, id));
   }
 
-  private async updateTemplate(update: TemplateData, x: number = 0, y: number = 0): Promise<TemplateData> {
+  private async updateTemplate(update: TemplateData, x: number = 0, y: number = 0, raw: boolean = false): Promise<TemplateData> {
     const currentCanvas = document.createElement('canvas');
     currentCanvas.width = this.currentTemplate!.width;
     currentCanvas.height = this.currentTemplate!.height;
@@ -132,25 +129,29 @@ export class TemplateController extends EventEmitter {
 
     this.currentTemplate!.drawTo(currentCtx);
 
-    const updateCanvas = document.createElement('canvas');
-    updateCanvas.width = update.width;
-    updateCanvas.height = update.height;
-    const updateCtx = updateCanvas.getContext('2d') as CanvasRenderingContext2D;
+    if (raw) {
+      update.drawTo(currentCtx, x, y);
+    } else {
+      const updateCanvas = document.createElement('canvas');
+      updateCanvas.width = update.width;
+      updateCanvas.height = update.height;
+      const updateCtx = updateCanvas.getContext('2d') as CanvasRenderingContext2D;
 
-    update.drawTo(updateCtx);
+      update.drawTo(updateCtx);
 
-    for (let uy = 0; uy < update.height; uy++) {
-      for (let ux = 0; ux < update.width; ux++) {
-        let color = updateCtx.getImageData(ux, uy, 1, 1).data;
+      for (let uy = 0; uy < update.height; uy++) {
+        for (let ux = 0; ux < update.width; ux++) {
+          let color = updateCtx.getImageData(ux, uy, 1, 1).data;
 
-        if (color[0] == 0 && color[1] == 255 && color[2] == 255 && color[3] == 254) {
-          // Nothing changed here. Skip it.
-          continue;
+          if (color[0] == 0 && color[1] == 255 && color[2] == 255 && color[3] == 254) {
+            // Nothing changed here. Skip it.
+            continue;
+          }
+
+          currentCtx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${color[3]})`;
+          currentCtx.clearRect(x + ux, y + uy, 1, 1);
+          currentCtx.fillRect(x + ux, y + uy, 1, 1);
         }
-
-        currentCtx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${color[3]})`;
-        currentCtx.clearRect(x + ux, y + uy, 1, 1);
-        currentCtx.fillRect(x + ux, y + uy, 1, 1);
       }
     }
 
@@ -204,9 +205,10 @@ export class TemplateController extends EventEmitter {
 
       // We convert the RawDiffTemplateUpdate into a DiffTemplateUpdate via processTemplateImage
       let templateData = await this.fetchImage(diffData.diff);
-      this.currentTemplate = await this.updateTemplate(templateData, diffData.x, diffData.y);
+      this.currentTemplate = await this.updateTemplate(templateData, diffData.x, diffData.y, diffData.raw ?? false);
       this.emit("update", this.currentTemplate);
-      this.lastId = diffData.current_id;
+      if (diffData.current_id != null)
+        this.lastId = diffData.current_id;
     }
   }
 
@@ -244,6 +246,7 @@ interface DiffTemplateUpdate {
   current_id: string,
   x: number,
   y: number,
+  raw: boolean,
   diff: string,
   resize?: TemplateResizeUpdate
 }
