@@ -69,11 +69,11 @@ const autoPickAfterPlaceTimeout = 3000;
 
     // Analytics
     // TODO: Fix analytics
-    /*minimap.rPlace!.embed._events._getEventTarget().addEventListener("confirm-pixel", () => {
+    minimap.rPlace!.embed._events._getEventTarget().addEventListener("confirm-pixel", () => {
       const now = Date.now();
       const reddit = now + minimap.rPlace!.embed.nextTileAvailableIn * 1000;
       const safe = reddit + autoPickAfterPlaceTimeout;
-      analytics.placedPixel('manual-browser', minimap.templates.currentTemplate.name, minimap.rPlace!.position.pos, minimap.rPlace!.embed.selectedColor, now, {
+      analytics.placedPixel('manual-browser', faction, minimap.rPlace!.position.pos, minimap.rPlace!.embed.selectedColor, now, {
         reddit: reddit,
         safe: safe
       });
@@ -81,12 +81,12 @@ const autoPickAfterPlaceTimeout = 3000;
     minimap.comparer!.addEventListener("computed", () => {
       if (Math.random() < 0.01) {
         analytics.statusUpdate(
-          minimap.templates.currentTemplate.name,
+          faction,
           minimap.comparer!.countOfAllPixels,
           minimap.comparer!.countOfWrongPixels
         );
       }
-    });*/
+    });
   } else {
     // Data mode. Connects to WebSockets and forwards them to the Canvas instance.
     const mqttClient = new MqttWSClient("wss://realtime.minimap.brony.place");
