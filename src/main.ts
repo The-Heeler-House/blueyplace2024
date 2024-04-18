@@ -15,10 +15,11 @@ import {Analytics} from './analytics';
 import {AnalyticsLogger} from './logger';
 import {Minimap} from './minimap/minimap';
 import {Notifications} from "./notifications/notifications";
-import {MqttWSClient} from "./mqttWSClient";
-import {MqttMinimapClient} from "./mqttMinimapClient";
+import {MqttWSClient} from "./realtime/mqttWSClient";
+import {MqttMinimapClient} from "./realtime/mqttMinimapClient";
 import {waitForDocumentLoad} from "./canvas";
 import { v4 as uuidv4 } from "uuid";
+import {TemplateController} from "./template/template";
 
 const autoPickAfterPlaceTimeout = 3000;
 
@@ -30,36 +31,45 @@ const autoPickAfterPlaceTimeout = 3000;
       localStorage.setItem("ponyplace-id", uuidv4());
     }
 
+    const faction = "lemmy";
+
     const analytics = new Analytics(new URL('https://api.minimap.brony.place/analytics/'));
     const analyticsLogger = new AnalyticsLogger(analytics);
 
     const mqttClient = new MqttMinimapClient();
 
-    const minimap = new Minimap(analyticsLogger);
-
     const notifications = new Notifications(mqttClient);
 
+    const templateController = new TemplateController(mqttClient, notifications);
+
+    const minimap = new Minimap(analyticsLogger, templateController);
+
     const blobServer = new BlobServer("https://cdn.minimap.brony.place");
-    //minimap.templates.add("mlp_alliance", blobServer.getTemplate("mlp_alliance", {autoPick: true, mask: true}));
-    //minimap.templates.add("mlp_world", blobServer.getTemplate("mlp_world", {autoPick: true, mask: true}));
-    minimap.templates.add("mlp", blobServer.getTemplate("mlp", {autoPick: true, mask: true}));
 
     await waitForDocumentLoad();
     await waitMs(1000);
 
-    if (!await minimap.initialize())
+    if (!await minimap.initialize()) {
+      // Minimap fell back. Initiate template controller and mqtt only.
+      if (!await templateController.initiate())
+        return;
+      if (!mqttClient.initiate(faction))
+        return;
       return;
+    }
 
     if (!await notifications.initialize())
       return;
 
-    if (!mqttClient.initiate("test"))
+    if (!await templateController.initiate())
       return;
 
-    minimap.templates.startUpdateLoop();
+    if (!mqttClient.initiate(faction))
+      return;
 
     // Analytics
-    minimap.rPlace!.embed._events._getEventTarget().addEventListener("confirm-pixel", () => {
+    // TODO: Fix analytics
+    /*minimap.rPlace!.embed._events._getEventTarget().addEventListener("confirm-pixel", () => {
       const now = Date.now();
       const reddit = now + minimap.rPlace!.embed.nextTileAvailableIn * 1000;
       const safe = reddit + autoPickAfterPlaceTimeout;
@@ -76,7 +86,7 @@ const autoPickAfterPlaceTimeout = 3000;
           minimap.comparer!.countOfWrongPixels
         );
       }
-    });
+    });*/
   } else {
     // Data mode. Connects to WebSockets and forwards them to the Canvas instance.
     const mqttClient = new MqttWSClient("wss://realtime.minimap.brony.place");

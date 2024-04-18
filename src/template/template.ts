@@ -6,164 +6,37 @@
  *
  **
  *
- * @file Interface for templates.
+ * @file Interface for templating and the updating of templates.
  *
  **/
+import EventEmitter from "../EventEmitter";
+import {MqttMinimapClient} from "../realtime/mqttMinimapClient";
+import {gm_fetch} from "../utils";
+import {Notifications} from "../notifications/notifications";
 
-import {AsyncWorkQueue, gm_fetch, headerStringToObject, waitMs} from "../utils";
+export class TemplateData {
+  private image: ImageData;
 
-export class TemplatePixels {
-  #image: ImageData;
-  cacheKey?: string;
-
-  constructor(image: ImageData, cacheKey?: string) {
-    this.#image = image;
-    this.cacheKey = cacheKey;
+  constructor(image: ImageData) {
+    this.image = image;
   }
 
-  getWidth(): number {
-    return this.#image.width;
+  get width(): number {
+    return this.image.width;
   }
 
-  getHeight(): number {
-    return this.#image.height;
-  }
-
-  getImageData(): Uint8ClampedArray {
-    return this.#image.data;
-  }
-
-  drawTo(canvas: CanvasRenderingContext2D) {
-    canvas.putImageData(this.#image, 0, 0);
-  }
-
-  getDithered3x(): ImageData {
-    const ret = new ImageData(this.#image.width * 3, this.#image.height * 3);
-    for (let y = 0; y < this.#image.height; ++y)
-      for (let x = 0; x < this.#image.width; ++x) {
-        const sourceLoc = (y * this.#image.width + x) * 4;
-        const destLoc = ((y * 3 + 1) * ret.width + (x * 3 + 1)) * 4;
-        for (let i = 0; i < 4; ++i)
-          ret.data[destLoc + i] = this.#image.data[sourceLoc + i];
-      }
-    return ret;
-  }
-}
-
-type UpdateResult = 'MaybeChangedCached' | 'MaybeChangedNotCached' | 'NotChanged';
-
-function mergeResponse(current: UpdateResult, resp: GM.Response<any>): UpdateResult {
-  const headers = headerStringToObject(resp.responseHeaders);
-  if (current == 'MaybeChangedNotCached' || !headers.etag)
-    return 'MaybeChangedNotCached';
-  if (current == 'MaybeChangedCached' || resp.status != 304)
-    return 'MaybeChangedCached';
-  return 'NotChanged';
-}
-
-export interface Template {
-  template: TemplatePixels;
-  mask?: TemplatePixels;
-
-  updateIfDifferent(): Promise<UpdateResult>;
-}
-
-export class ImageTemplate implements Template {
-  template: TemplatePixels;
-  templateURL: URL;
-  mask?: TemplatePixels;
-  maskURL?: URL;
-  width: number;
-  height: number;
-
-  private constructor(width: number, height: number, template: TemplatePixels, templateURL: URL,
-                      mask?: TemplatePixels, maskURL?: URL) {
-    this.template = template;
-    this.templateURL = templateURL;
-    this.mask = mask;
-    this.maskURL = maskURL;
-    this.width = width;
-    this.height = height;
-  }
-
-  private async update(template: TemplatePixels, url: URL) {
-    let headers = {};
-    if (template.cacheKey)
-      headers['If-None-Match'] = template.cacheKey;
-    const resp = await ImageTemplate.fetchURL(url, {
-      headers: headers
-    });
-    if (resp.status == 304)
-      return 'NotChanged';
-    if (resp.status != 200)
-      throw resp;
-    return {
-      template: await ImageTemplate.pixelsFromResponse(resp),
-      response: resp
-    };
-  }
-
-  async updateIfDifferent() {
-    let changed: UpdateResult = 'NotChanged';
-    const tr = await this.update(this.template, this.templateURL);
-    if (tr != 'NotChanged') {
-      this.template = tr.template;
-      changed = mergeResponse(changed, tr.response);
-    }
-    if (this.mask) {
-      const mr = await this.update(this.mask, this.maskURL!);
-      if (mr != 'NotChanged') {
-        this.mask = mr.template;
-        changed = mergeResponse(changed, mr.response);
-      }
-    }
-    return changed;
-  }
-
-  private static async fetchURL(url: URL, req?) {
-    return await gm_fetch({
-      ...req,
-      method: "GET",
-      responseType: "arraybuffer",
-      url: `${url}?t=${Date.now()}`
-    });
-  }
-
-  private static async pixelsFromResponse(resp: GM.Response<any>) {
-    const bitmap = await createImageBitmap(new Blob([new Uint8ClampedArray(resp.response)]));
-    const canvas = document.createElement('canvas');
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-    const context = canvas.getContext('2d')!;
-    context.drawImage(bitmap, 0 , 0);
-    const imgData = context.getImageData(0, 0, bitmap.width, bitmap.height);
-    return new TemplatePixels(imgData, headerStringToObject(resp.responseHeaders).ETag);
-  }
-
-  private static async fetchTemplatePixels(URL: URL): Promise<TemplatePixels> {
-    const resp = await this.fetchURL(URL);
-    if (resp.status != 200)
-     throw resp;
-    return await this.pixelsFromResponse(resp);
-  }
-
-  static async fetchTemplate(templateURL: URL, maskURL?: URL) {
-    const template = await this.fetchTemplatePixels(templateURL);
-    let mask = maskURL ? await this.fetchTemplatePixels(maskURL) : undefined;
-    if (mask && ((mask.getHeight() != template.getHeight()) ||
-                 (mask.getWidth() != template.getWidth()))) {
-      mask = undefined;
-    }
-    return new ImageTemplate(template.getWidth(), template.getHeight(), template, templateURL, mask,
-                             maskURL);
+  get height(): number {
+    return this.image.height;
   }
 
   palettize(pallete) {
-    const data = this.template.getImageData();
+    const data = this.image.data;
     for (let i = 0; i < data.length / 4; i++) {
       const base = i * 4;
       const currentColor = data.slice(base, base + 3);
+      const currentAlpha = data[base+ 3];
       if (currentColor[0] + currentColor[1] + currentColor[2] === 0) continue;
+      if (currentColor[0] === 0 && currentColor[1] === 255 && currentColor[2] === 255 && currentAlpha === 254) continue;
 
       let newColor;
       let bestDiff = Infinity;
@@ -183,27 +56,201 @@ export class ImageTemplate implements Template {
       data[base + 2] = newColor[2];
     }
   }
+
+  drawTo(canvas: CanvasRenderingContext2D, x: number = 0, y: number = 0) {
+    canvas.putImageData(this.image, x, y);
+  }
+
+  getDithered3x(): ImageData {
+    const ret = new ImageData(this.image.width * 3, this.image.height * 3);
+    for (let y = 0; y < this.image.height; ++y)
+      for (let x = 0; x < this.image.width; ++x) {
+        const sourceLoc = (y * this.image.width + x) * 4;
+        const destLoc = ((y * 3 + 1) * ret.width + (x * 3 + 1)) * 4;
+        for (let i = 0; i < 4; ++i)
+          ret.data[destLoc + i] = this.image.data[sourceLoc + i];
+      }
+    return ret;
+  }
+
+  toDithered3x() {
+    let newImage = this.getDithered3x();
+    return new TemplateData(newImage);
+  }
 }
 
-export async function updateLoop(workQueue: AsyncWorkQueue, getTemplate: () => Template,
-                                 applyTemplate: () => void) {
-  // Wait before trying to update.
-  await waitMs(60 * 1000);
-  while (true) {
-    try {
-      const result = await workQueue.enqueue(async () => {
-        const result = await getTemplate().updateIfDifferent();
-        if (result.startsWith("MaybeChanged"))
-          applyTemplate();
-        return result;
-      });
-      if (result == 'MaybeChangedCached' || result == 'NotChanged')
-        await waitMs(30 * 1000);
-      else if (result == 'MaybeChangedNotCached')
-        await waitMs(300 * 1000);
-    } catch(err) {
-      console.error("Error updating template", err);
-      await waitMs(60 * 1000);
+export class TemplateController extends EventEmitter {
+  private baseURL = "https://cdn.minimap.brony.place/templates";
+  private faction: string = "";
+  currentTemplate: TemplateData | null = null;
+  private lastId: string = "";
+  private mqtt: MqttMinimapClient | null = null;
+  private notifications: Notifications | null = null;
+
+  constructor(mqtt: MqttMinimapClient, notifications: Notifications) {
+    super();
+
+    this.mqtt = mqtt;
+    this.notifications = notifications;
+  }
+
+  private getBaseURL(faction: string, id: string) {
+    return `${this.baseURL}/${faction}/full/${id}.png`;
+  }
+
+  private async fetchImage(url: string): Promise<TemplateData> {
+    let resp = await gm_fetch({
+      method: "GET",
+      responseType: "arraybuffer",
+      url
+    });
+    
+    console.log(url);
+    console.log(resp);
+
+    if (resp.status != 200)
+      throw new HTTPResponseError(resp.status, resp.statusText);
+
+    const bitmap = await createImageBitmap(new Blob([new Uint8ClampedArray(resp.response)]));
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(bitmap, 0 , 0);
+    return new TemplateData(context.getImageData(0, 0, bitmap.width, bitmap.height));
+  }
+
+  private async fetchBaseImage(faction: string, id: string): Promise<TemplateData> {
+    return this.fetchImage(this.getBaseURL(faction, id));
+  }
+
+  private async updateTemplate(update: TemplateData, x: number = 0, y: number = 0): Promise<TemplateData> {
+    const currentCanvas = document.createElement('canvas');
+    currentCanvas.width = this.currentTemplate!.width;
+    currentCanvas.height = this.currentTemplate!.height;
+    const currentCtx = currentCanvas.getContext('2d') as CanvasRenderingContext2D;
+
+    this.currentTemplate!.drawTo(currentCtx);
+
+    const updateCanvas = document.createElement('canvas');
+    updateCanvas.width = update.width;
+    updateCanvas.height = update.height;
+    const updateCtx = updateCanvas.getContext('2d') as CanvasRenderingContext2D;
+
+    update.drawTo(updateCtx);
+
+    for (let uy = 0; uy < update.height; uy++) {
+      for (let ux = 0; ux < update.width; ux++) {
+        let color = updateCtx.getImageData(ux, uy, 1, 1).data;
+
+        if (color[0] == 0 && color[1] == 255 && color[2] == 255 && color[3] == 254) {
+          // Nothing changed here. Skip it.
+          continue;
+        }
+
+        currentCtx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${color[3]})`;
+        currentCtx.clearRect(x + ux, y + uy, 1, 1);
+        currentCtx.fillRect(x + ux, y + uy, 1, 1);
+      }
+    }
+
+    return new TemplateData(currentCtx.getImageData(0, 0, currentCanvas.width, currentCanvas.height));
+  }
+
+  private async resizeTemplate(top: number, bottom: number, left: number, right: number) {
+    const canvas = document.createElement('canvas');
+    canvas.width = (left + this.currentTemplate!.width + right);
+    canvas.height = (top + this.currentTemplate!.height + bottom);
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    this.currentTemplate!.drawTo(ctx, left, top);
+
+    return new TemplateData(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  }
+
+  async onUpdate(data: TemplateUpdate, retained: boolean) {
+    if (data.type === "full") {
+      const fullData = data as FullTemplateUpdate;
+
+      if (this.lastId == fullData.id) return;
+
+      this.currentTemplate = await this.fetchBaseImage(this.faction, fullData.id);
+      this.emit("update", this.currentTemplate);
+      this.lastId = fullData.id;
+    }
+    if (data.type === "diff") {
+      const diffData = data as DiffTemplateUpdate;
+      if (retained) {
+        if (this.lastId != diffData.current_id) {
+          if (this.lastId != diffData.previous_id) {
+            // Get the current template then let stuff below work.
+            this.currentTemplate = await this.fetchBaseImage(this.faction, diffData.previous_id);
+          }
+          // From this point, we'll fall down to the normal non-retained behaviour.
+        } else {
+          // Nothing else to do.
+          return;
+        }
+      }
+      // Handle resize if present
+      if (diffData.resize) {
+        this.currentTemplate = await this.resizeTemplate(
+          diffData.resize.top ?? 0,
+          diffData.resize.bottom ?? 0,
+          diffData.resize.left ?? 0,
+          diffData.resize.right ?? 0
+        );
+      }
+
+      // We convert the RawDiffTemplateUpdate into a DiffTemplateUpdate via processTemplateImage
+      let templateData = await this.fetchImage(diffData.diff);
+      this.currentTemplate = await this.updateTemplate(templateData, diffData.x, diffData.y);
+      this.emit("update", this.currentTemplate);
+      this.lastId = diffData.current_id;
     }
   }
+
+  setFaction(faction: string) {
+    this.faction = faction;
+  }
+
+  async initiate() {
+    this.mqtt!.addEventListener("updates", (data: TemplateUpdate, retained: boolean) => this.onUpdate(data, retained));
+    this.mqtt!.addEventListener("faction", (faction: string) => this.setFaction(faction));
+
+    return true;
+  }
+}
+
+export class HTTPResponseError extends Error {
+  constructor(status: number, message: string) {
+    super(`[${status}] ${message}`);
+  }
+}
+
+interface TemplateUpdate {
+  type: "diff" | "full",
+  message?: string
+}
+
+interface FullTemplateUpdate {
+  type: "full",
+  id: string
+}
+
+interface DiffTemplateUpdate {
+  type: "diff",
+  previous_id: string,
+  current_id: string,
+  x: number,
+  y: number,
+  diff: string,
+  resize?: TemplateResizeUpdate
+}
+
+interface TemplateResizeUpdate {
+  top?: number,
+  bottom?: number,
+  left?: number,
+  right?: number
 }

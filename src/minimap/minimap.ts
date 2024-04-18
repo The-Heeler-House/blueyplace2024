@@ -1,12 +1,12 @@
-import {getMostLikelyCanvas, getRedditCanvas, RedditCanvas, waitForDocumentLoad} from "../canvas";
+import {getMostLikelyCanvas, getRedditCanvas, RedditCanvas } from "../canvas";
 import {fallbackOverlay, Overlay} from "../overlay";
 import {CanvasComparer} from "../canvasComparer";
-import {ButtonSetting, CheckboxSetting, CycleSetting, DisplaySetting, Settings} from "./minimap-components";
+import {ButtonSetting, CheckboxSetting, DisplaySetting, Settings} from "./minimap-components";
 import {createMinimapUI, MinimapUI} from "./minimap-ui";
-import {MinimapTemplateController} from "../templateController";
 import {waitMs} from "../utils";
 import {html} from "uhtml";
 import {Logger} from "../logger";
+import {TemplateController, TemplateData} from "../template/template";
 
 const comparerTimeout = 5000;
 
@@ -21,10 +21,11 @@ export class Minimap {
   ui: MinimapUI | undefined = undefined;
   logger: Logger;
 
-  templates: MinimapTemplateController = new MinimapTemplateController();
+  templateController: TemplateController
 
-  constructor(logger: Logger) {
+  constructor(logger: Logger, templateController: TemplateController) {
     this.logger = logger;
+    this.templateController = templateController;
   }
 
   async takeScreenshotOfCanvas() {
@@ -66,16 +67,12 @@ export class Minimap {
   }
 
   async initialize() {
-    this.templates.set(this.templates.keys[0]);
-
-    //await waitForDocumentLoad();
-    //await waitMs(1000);
     this.rPlace = await getRedditCanvas();
     if (!this.rPlace) {
       const canvas = getMostLikelyCanvas();
       // Start overlay async.
       this.logger.logError("Failed to find site specific handler. Falling back to overlay.");
-      await fallbackOverlay(canvas!, this.templates.currentTemplate.url);
+      await fallbackOverlay(canvas!, this.templateController);
       // Don't load the settings interface, some pixel game sites will ban you for mousedown/mouseup
       // events.
       return false;
@@ -90,7 +87,7 @@ export class Minimap {
     this.maskCanvas.height = this.rPlaceCanvas.height;
     this.comparer = new CanvasComparer(this.rPlaceCanvas, this.templateCanvas, this.maskCanvas);
 
-    this.settings.addSetting(
+    /*this.settings.addSetting(
       "templateName",
       new CycleSetting(
         "Template",
@@ -102,7 +99,7 @@ export class Minimap {
         },
         true
       )
-    );
+    );*/
 
     this.settings.addSetting(
       "findArt",
@@ -123,20 +120,24 @@ export class Minimap {
       })
     );
 
-    const enableAutoPickSetting = await GM.getValue('enableAutoPick', false);
+    // TODO: Reimplement this
+    /*const enableAutoPickSetting = await GM.getValue('enableAutoPick', false);
     this.settings.addSetting(
       "autoPick",
       new CheckboxSetting("Use the priority-based template", enableAutoPickSetting, (autoPickSetting) => {
         GM.setValue('enableAutoPick', autoPickSetting.enabled);
         this.templates!.fetch(autoPickSetting.enabled);
       })
-    );
+    );*/
 
     const enableOverlay = await GM.getValue('enableOverlay', false);
     this.settings.addSetting(
       "overlay",
       new CheckboxSetting("Fullscreen overlay", enableOverlay, (overlaySetting) => {
         GM.setValue('enableOverlay', overlaySetting.enabled);
+        if (!(this.overlay instanceof Overlay)) {
+          this.overlay = new Overlay(this.rPlaceCanvas!, this.templateController, this.templateController.currentTemplate!);
+        }
         if (overlaySetting.enabled) {
           this.overlay!.show();
         } else {
@@ -164,23 +165,26 @@ export class Minimap {
       })
     );
 
-    // TODO: Replace with listener for MQTT
-    this.templates.addEventListener("templateFetched", () => {
-      const template = this.templates.currentTemplate.obj;
-      template!.palettize(this.rPlace!.palette);
-      this.ui!.setTemplate(template!);
-      this.ui!.recalculateImagePos(this.rPlace!.position.pos);
-      if (this.overlay instanceof Overlay) {
-        this.overlay.applyTemplate(template!);
-      } else {
-        this.overlay = new Overlay(this.rPlaceCanvas!, null, template!);
-        if (!this.settings!.getSetting("overlay").enabled) this.overlay.hide();
+    this.settings.addSetting(
+      "copyPallet",
+      new ButtonSetting("Copy pallet", () => {
+        let data: string[] = [];
+
+        this.rPlace?.palette.forEach(color => {
+          data.push(`{${color[0]},${color[1]},${color[2]}}`);
+        });
+
+        navigator.clipboard.writeText(`{${data.join(",")}}`);
+      })
+    );
+
+    this.templateController.addEventListener("update", async (template: TemplateData) => {
+      if (!(this.overlay instanceof Overlay) && await GM.getValue("enableOverlay")) {
+        this.overlay = new Overlay(this.rPlaceCanvas!, this.templateController, template!);
       }
-      const maskCtx = this.maskCanvas!.getContext("2d");
-      maskCtx!.clearRect(0, 0, this.maskCanvas!.width, this.maskCanvas!.height);
-      if (template!.mask) {
-        template!.mask.drawTo(maskCtx!);
-      }
+
+      console.log("minimap template update");
+      this.ui!.setTemplate(template);
     });
 
     const actions = this.rPlace!.embed
@@ -213,7 +217,7 @@ export class Minimap {
       }
     });
 
-    await this.templates.fetch(this.settings.getSetting("autoPick").enabled);
+    //await this.templates.fetch(this.settings.getSetting("autoPick").enabled);
     return true;
   }
 

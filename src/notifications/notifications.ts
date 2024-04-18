@@ -1,5 +1,5 @@
 import {createNotificationsUI, NotificationLevel, NotificationsUi} from "./notifications-ui";
-import {MqttMinimapClient} from "../mqttMinimapClient";
+import {MqttMinimapClient} from "../realtime/mqttMinimapClient";
 
 /**
  *

@@ -10,9 +10,9 @@
  *
  **/
 
-import {Template} from "../template/template";
 import {constants} from "../constants";
 import {Resizer} from "./minimap-components";
+import {TemplateData} from "../template/template";
 
 const htmlBlock = `<style>
 mlpminimap {
@@ -21,8 +21,8 @@ mlpminimap {
   width: 400px;
   height: 300px;
   position: absolute;
-  top: 0%;
-  right: 0%;
+  top: 0;
+  right: 0;
   background-color: rgba(0,0,0,.75);
   border: 1px solid black;
   overflow: hidden;
@@ -47,10 +47,10 @@ mlpminimap .crosshair {
 
 mlpminimap #resizer {
   position: absolute;
-  bottom: 0%;
-  left: 0%;
-  width: 0px;
-  height: 0px;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
   border-bottom: 10px solid red;
   border-left: 10px solid red;
   border-top: 10px solid transparent;
@@ -114,10 +114,10 @@ export class MinimapUI {
     });
   }
 
-  setTemplate(template: Template) {
-    this.imageCanvas.width = template.template.getWidth();
-    this.imageCanvas.height = template.template.getHeight();
-    template.template.drawTo(this.imageCanvasCtx);
+  setTemplate(template: TemplateData) {
+    this.imageCanvas.width = template.width;
+    this.imageCanvas.height = template.height;
+    template.drawTo(this.imageCanvasCtx);
   }
 
   recalculateImagePos(pos: MonaLisa.Pos | undefined = undefined) {

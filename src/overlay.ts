@@ -10,19 +10,18 @@
  *
  **/
 
-import {ImageTemplate, updateLoop} from "./template/template";
-import {AsyncWorkQueue, waitMs} from "./utils";
+import {TemplateController, TemplateData} from "./template/template";
 
 export class Overlay {
   canvas: HTMLCanvasElement;
-  templateDict;
-  template: ImageTemplate;
+  templateController: TemplateController;
+  template: TemplateData;
   overlayCanvas: HTMLCanvasElement;
   overlayContext: CanvasRenderingContext2D;
 
-  constructor(canvas: HTMLCanvasElement, templateDict, template: ImageTemplate) {
+  constructor(canvas: HTMLCanvasElement, templateController: TemplateController, template: TemplateData) {
     this.canvas = canvas;
-    this.templateDict = templateDict;
+    this.templateController = templateController;
     this.template = template;
     this.overlayCanvas = document.createElement('canvas');
     this.overlayContext = this.overlayCanvas.getContext('2d')!;
@@ -30,9 +29,8 @@ export class Overlay {
     this.updateOverlayStyle();
   }
 
-  static async create(canvas: HTMLCanvasElement, templateDict) {
-    const template = await ImageTemplate.fetchTemplate(templateDict.canvasUrl);
-    return new Overlay(canvas, templateDict, template);
+  static async create(canvas: HTMLCanvasElement, templateController: TemplateController) {
+    return new Overlay(canvas, templateController, templateController.currentTemplate!);
   }
 
   inject() {
@@ -41,6 +39,12 @@ export class Overlay {
       this.updateOverlayStyle();
     });
     canvasObserver.observe(this.canvas, {attributes: true});
+
+    this.templateController.addEventListener("update", (template: TemplateData) => {
+      console.log("overlay template update");
+      this.applyTemplate(template);
+      this.updateOverlayStyle();
+    });
   }
 
   updateOverlayStyle() {
@@ -82,12 +86,14 @@ export class Overlay {
     }
   }
 
-  applyTemplate(template: ImageTemplate | undefined = undefined) {
-    if (template instanceof ImageTemplate){
+  applyTemplate(template: TemplateData | undefined = undefined) {
+    if (template instanceof TemplateData){
       this.template = template;
     }
-    const dithered = this.template.template.getDithered3x();
-    this.overlayContext.putImageData(dithered, 0, 0);
+
+    this.overlayCanvas.width = this.template.width;
+    this.overlayCanvas.height = this.template.height;
+    this.overlayContext.putImageData(this.template.getDithered3x(), 0, 0);
   }
 
   hide(){
@@ -97,12 +103,8 @@ export class Overlay {
   show(){
     this.overlayCanvas.style.display = 'unset';
   }
-};
+}
 
-export async function fallbackOverlay(canvas: HTMLCanvasElement, templateDict) {
-  const overlay = await Overlay.create(canvas, templateDict);
-  
-  const queue = new AsyncWorkQueue();
-  // Start the update loop, runs in the background.
-  updateLoop(queue, () => {return overlay.template;}, () => {overlay.applyTemplate();});
+export async function fallbackOverlay(canvas: HTMLCanvasElement, templateController: TemplateController) {
+  const overlay = await Overlay.create(canvas, templateController);
 }

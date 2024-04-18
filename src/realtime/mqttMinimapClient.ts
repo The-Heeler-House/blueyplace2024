@@ -45,6 +45,7 @@ export class MqttMinimapClient extends EventEmitter {
     console.log(`PonyPlace switching from ${this.faction} to ${faction}`);
     this.subscribe(`templates/${faction}/#`);
     this.faction = faction;
+    this.emit("faction", faction);
   }
 
   private subscribe(topic: string) {
@@ -83,6 +84,7 @@ export class MqttMinimapClient extends EventEmitter {
     });
 
     this.faction = faction;
+    this.emit("faction", faction);
 
     return true;
   }

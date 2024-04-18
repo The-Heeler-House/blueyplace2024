@@ -1,5 +1,5 @@
 import {AsyncWorkQueue, Emitter} from "./utils";
-import {ImageTemplate, updateLoop} from "./template/template";
+import {ImageTemplate} from "./template/templateOld";
 
 interface MinimapTemplate {
   name: string;
@@ -38,7 +38,7 @@ export class MinimapTemplateController extends Emitter {
         _root.currentTemplate.url.autoPickUrl !== undefined && isAutoPick
           ? _root.currentTemplate.url.autoPickUrl
           : _root.currentTemplate.url.canvasUrl;
-      _root.currentTemplate.obj = await ImageTemplate.fetchTemplate(rPlaceTemplateUrl, _root.currentTemplate.url.maskUrl);
+      _root.currentTemplate.obj = await ImageTemplate.fetchTemplate(rPlaceTemplateUrl);
       _root.dispatchEvent(new Event("templateFetched"));
     });
   }
@@ -48,9 +48,10 @@ export class MinimapTemplateController extends Emitter {
   }
 
   startUpdateLoop() {
-    const _root = this;
+    // no.
+    /*const _root = this;
     updateLoop(this.templateWorkQueue, () => { return this.currentTemplate.obj!; }, () => {
       _root.dispatchEvent(new Event("templateFetched"));
-    });
+    });*/
   }
 }
