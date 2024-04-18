@@ -91,8 +91,8 @@ export class Overlay {
       this.template = template;
     }
 
-    this.overlayCanvas.width = this.template.width;
-    this.overlayCanvas.height = this.template.height;
+    this.overlayCanvas.width = this.template.width * 3;
+    this.overlayCanvas.height = this.template.height * 3;
     this.overlayContext.putImageData(this.template.getDithered3x(), 0, 0);
   }
 
