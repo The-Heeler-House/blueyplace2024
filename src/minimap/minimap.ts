@@ -183,7 +183,6 @@ export class Minimap {
         this.overlay = new Overlay(this.rPlaceCanvas!, this.templateController, template!);
       }
 
-      console.log("minimap template update");
       this.ui!.setTemplate(template);
     });
 

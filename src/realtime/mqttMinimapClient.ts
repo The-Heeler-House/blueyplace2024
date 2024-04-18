@@ -16,7 +16,7 @@ export class MqttMinimapClient extends EventEmitter {
 
   constructor() {
     super();
-    console.log("hello! i am part of the minimap!");
+    console.debug("MqttMinimapClient constructed within r/place embed.");
 
     window.onmessage = (message) => this.processMessage(message);
   }
@@ -42,7 +42,7 @@ export class MqttMinimapClient extends EventEmitter {
   setFaction(faction: string) {
     // Unsubscribes from current faction and resubscribes to new faction.
     this.unsubscribe(`templates/${this.faction}/#`);
-    console.log(`PonyPlace switching from ${this.faction} to ${faction}`);
+    console.debug(`PonyPlace switching from ${this.faction} to ${faction}`);
     this.subscribe(`templates/${faction}/#`);
     this.faction = faction;
     this.emit("faction", faction);
@@ -77,7 +77,6 @@ export class MqttMinimapClient extends EventEmitter {
    * @param faction
    */
   initiate(faction: string) {
-    console.log("awaken!");
     window.parent.postMessage({
       action: "open",
       payload: { id: localStorage.getItem("ponyplace-id"), topic: faction ? `templates/${faction}/#` : undefined }

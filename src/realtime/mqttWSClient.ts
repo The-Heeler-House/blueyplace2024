@@ -20,7 +20,7 @@ export class MqttWSClient {
   private client: MqttClient | null = null;
 
   constructor(url: string) {
-    console.log("hello! i am seperate from the minimap!");
+    console.debug("MqttWSClient constructed outside r/place embed");
     this.url = url;
   }
 
@@ -36,8 +36,6 @@ export class MqttWSClient {
     await waitMs(100);
 
     window.onmessage = (message) => {
-      console.log(message);
-      console.log("hey! listen!");
       // Message format:
       /*
         {
@@ -50,7 +48,7 @@ export class MqttWSClient {
 
       if (message.data.action === "open") {
         if (message.data.payload.id === undefined) return;
-        console.log("received open");
+        console.debug("Received open event from inside embed, connecting to MQTT broker.");
 
         // @ts-ignore
         this.client = mqtt.connect(this.url, {
