@@ -1,9 +1,13 @@
 # Contributors
 
-* [CordyLight](https://github.com/CordyLight)
+## The Heeler House
+* [jalenluorion](https://github.com/jalenluorion)
+* [IcyPenguin28](https://github.com/IcyPenguin28)
+* [GrimmsterZed](https://github.com/GrimmsterZed)
+
+## r/Place Bronies
 * [bb010g](https://github.com/bb010g)
-* [octylFractal](https://github.com/octylFractal)
-* [Alch-Emi](https://github.com/Alch-Emi)
-* [lydianlights](https://github.com/lydianlights)
-* [Fluttershy](https://github.com/fluttershydev)
+* [fluttershydev](https://github.com/fluttershydev)
+* [aracat](https://github.com/aracat)
+* [Ponywka](https://github.com/Ponywka)
 * [CloudburstSys](https://github.com/CloudburstSys)
