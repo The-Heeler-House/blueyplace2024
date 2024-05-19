@@ -33,12 +33,41 @@ export class Overlay {
     return new Overlay(canvas, templateController, templateController.currentTemplate!);
   }
 
+  collectTransformParents() {
+    let nodesToFollow: HTMLElement[] = [];
+    let current: Node | null = this.overlayCanvas;
+    while (current) {
+      if (current instanceof HTMLElement) {
+        if (current.style.transform.includes("scale"))
+          nodesToFollow.push(current);
+        if (current.assignedSlot)
+          current = current.assignedSlot;
+        else if (current.parentNode)
+          current = current.parentNode
+      } else if (current instanceof ShadowRoot) {
+        if (current.host)
+          current = current.host;
+      } else {
+        current = null;
+      }
+    }
+    return nodesToFollow;
+  }
+
   inject() {
     this.canvas.parentElement!.appendChild(this.overlayCanvas);
     const canvasObserver = new MutationObserver(() => {
       this.updateOverlayStyle();
     });
     canvasObserver.observe(this.canvas, {attributes: true});
+
+    const nodes = this.collectTransformParents();
+    for (const node of nodes) {
+      const canvasZoomObserver = new MutationObserver(() => {
+        this.updateRenderingMode();
+      });
+      canvasZoomObserver.observe(node, {attributes: true, attributeFilter: ["style"]});
+    }
 
     this.templateController.addEventListener("update", (template: TemplateData) => {
       console.log("overlay template update");
@@ -47,7 +76,18 @@ export class Overlay {
     });
   }
 
+  updateRenderingMode() {
+    // TODO: Use visual viewport to be more correct here.
+    const rect = this.overlayCanvas.getBoundingClientRect();
+    if (rect.height < this.template.height * 8)
+      this.overlayCanvas.style.imageRendering = 'auto';
+    else
+      this.overlayCanvas.style.imageRendering = 'pixelated';
+  }
+
   updateOverlayStyle() {
+    if (!this.template)
+      return;
     let style = getComputedStyle(this.canvas);
     let shouldApplyTemplate = false;
     const newWidth = this.template.width * 3;
@@ -78,7 +118,7 @@ export class Overlay {
     this.overlayCanvas.style.height = `${this.template.height * heightFactor}px`;
     this.overlayCanvas.style.zIndex = `${parseInt(style.zIndex) + 1}`;
     this.overlayCanvas.style.pointerEvents = 'none';
-    this.overlayCanvas.style.imageRendering = 'pixelated';
+    this.updateRenderingMode();
 
     if (shouldApplyTemplate) {
       this.overlayContext = this.overlayCanvas.getContext('2d')!;
