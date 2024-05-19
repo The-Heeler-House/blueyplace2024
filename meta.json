@@ -1,8 +1,8 @@
 {
-  "name": "r/place MLP Minimap",
-  "author": "r/place MLP Minimap Authors",
+  "name": "Bluey Minimap",
+  "author": "Bluey Minimap Contributors",
   "description": "Minimap overlay and automatic selection of pixel + color for r/place",
-  "namespace": "https://place.equestria.horse/",
+  "namespace": "https://bluey-testing.conep.one/",
   "grant": [
     "GM.xmlHttpRequest",
     "GM.getValue",
@@ -12,19 +12,19 @@
   "include": [
     "https://hot-potato.reddit.com/embed*",
     "https://garlic-bread.reddit.com/embed*",
-    "https://place.equestria.horse/embed*",
+    "https://bluey-testing.conep.one/embed*",
     "https://reddit.com/r/place*",
     "https://www.reddit.com/r/place*",
-    "https://place.equestria.horse/"
+    "https://bluey-testing.conep.one/"
   ],
-  "downloadURL": "https://cdn.minimap.brony.place/minimap/loader.user.js",
-  "updateURL": "https://cdn.minimap.brony.place/minimap/loader.user.js",
+  "downloadURL": "https://cdn.bluey.conep.one/scripts/loader.user.js",
+  "updateURL": "https://cdn.bluey.conep.one/scripts/loader.user.js",
   "connect": [
     "raw.githubusercontent.com",
     "media.githubusercontent.com",
-    "cdn.minimap.brony.place",
-    "realtime.minimap.brony.place",
-    "api.minimap.brony.place"
+    "cdn.bluey.conep.one",
+    "realtime.bluey.conep.one",
+    "api.bluey.conep.one"
   ],
-  "version": "0.0.2"
+  "version": "0.0.1"
 }

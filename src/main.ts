@@ -33,7 +33,7 @@ const autoPickAfterPlaceTimeout = 3000;
 
     const faction = "lemmy";
 
-    const analytics = new Analytics(new URL('https://api.minimap.brony.place/analytics/'));
+    const analytics = new Analytics(new URL('https://api.bluey.conep.one/'));
     const analyticsLogger = new AnalyticsLogger(analytics);
 
     const mqttClient = new MqttMinimapClient();
@@ -44,7 +44,7 @@ const autoPickAfterPlaceTimeout = 3000;
 
     const minimap = new Minimap(analyticsLogger, templateController);
 
-    const blobServer = new BlobServer("https://cdn.minimap.brony.place");
+    const blobServer = new BlobServer("https://cdn.bluey.conep.one/");
 
     await waitForDocumentLoad();
     await waitMs(1000);
@@ -89,7 +89,7 @@ const autoPickAfterPlaceTimeout = 3000;
     });
   } else {
     // Data mode. Connects to WebSockets and forwards them to the Canvas instance.
-    const mqttClient = new MqttWSClient("wss://realtime.minimap.brony.place");
+    const mqttClient = new MqttWSClient("wss://realtime.bluey.conep.one");
     await mqttClient.initiate();
   }
 })();
