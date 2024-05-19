@@ -2,9 +2,9 @@
 
 <img src="public/BlueyHeart.png" alt="drawing" height="150" align="right" />
 
-Help [The Heeler House](https://discord.com/blueyheeler) and[r/Bluey](https://reddit.com/r/bluey) leave a mark on [r/Place 2024](https://reddit.com/r/place)!
+Help [The Heeler House](https://discord.com/blueyheeler) and [r/Bluey](https://reddit.com/r/bluey) leave a mark on [r/Place 2024](https://reddit.com/r/place)!
 
-This repository contains the source code for the official Blueyplace Minimap, placer analytics, and art templates.
+This repository contains the source code for the official Blueyplace minimap, placer analytics, and art templates.
 <br clear="right"/>
 
 ## I'm a heeler fan and wants to help place pixels!
