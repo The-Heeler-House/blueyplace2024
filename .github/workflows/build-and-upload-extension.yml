@@ -51,7 +51,7 @@ jobs:
           env_auth = false
           access_key_id = ${{ secrets.MINIO_ACCESS_KEY_ID }}
           secret_access_key = ${{ secrets.MINIO_SECRET_ACCESS_KEY }}
-          endpoint = cdn.bluey.conep.one
+          endpoint = cdn.place.heeler.house
           region = us-east-1
         disable_base64: true
 

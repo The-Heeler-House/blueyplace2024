@@ -79,7 +79,7 @@ export class MqttMinimapClient extends EventEmitter {
   initiate(faction: string) {
     window.parent.postMessage({
       action: "open",
-      payload: { id: localStorage.getItem("ponyplace-id"), topic: faction ? `templates/${faction}/#` : undefined }
+      payload: { id: localStorage.getItem("minimap-id"), topic: faction ? `templates/${faction}/#` : undefined }
     });
 
     this.faction = faction;

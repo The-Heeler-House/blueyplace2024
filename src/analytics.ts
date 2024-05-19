@@ -30,7 +30,7 @@ export class Analytics {
 
   constructor(endpoint: URL) {
     this.#endpoint = endpoint;
-    this.#uuid = localStorage.getItem("ponyplace-id") || null;
+    this.#uuid = localStorage.getItem("minimap-id") || null;
   }
 
   private send(data) {

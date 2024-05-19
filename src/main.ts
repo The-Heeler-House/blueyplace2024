@@ -27,13 +27,13 @@ const autoPickAfterPlaceTimeout = 3000;
   if (window.location.pathname.startsWith("/embed")) {
     // Canvas mode. Loads the minimap/overlay.
 
-    if (localStorage.getItem("ponyplace-id") === null) {
-      localStorage.setItem("ponyplace-id", uuidv4());
+    if (localStorage.getItem("minimap-id") === null) {
+      localStorage.setItem("minimap-id", uuidv4());
     }
 
     const faction = "lemmy";
 
-    const analytics = new Analytics(new URL('https://api.bluey.conep.one/'));
+    const analytics = new Analytics(new URL('https://api.place.heeler.house/'));
     const analyticsLogger = new AnalyticsLogger(analytics);
 
     const mqttClient = new MqttMinimapClient();
@@ -44,7 +44,7 @@ const autoPickAfterPlaceTimeout = 3000;
 
     const minimap = new Minimap(analyticsLogger, templateController);
 
-    const blobServer = new BlobServer("https://cdn.bluey.conep.one/");
+    const blobServer = new BlobServer("https://cdn.place.heeler.house/");
 
     await waitForDocumentLoad();
     await waitMs(1000);
@@ -89,7 +89,7 @@ const autoPickAfterPlaceTimeout = 3000;
     });
   } else {
     // Data mode. Connects to WebSockets and forwards them to the Canvas instance.
-    const mqttClient = new MqttWSClient("wss://realtime.bluey.conep.one");
+    const mqttClient = new MqttWSClient("wss://realtime.place.heeler.house");
     await mqttClient.initiate();
   }
 })();

@@ -80,7 +80,7 @@ export class TemplateData {
 }
 
 export class TemplateController extends EventEmitter {
-  private baseURL = "https://cdn.bluey.conep.one/templates";
+  private baseURL = "https://cdn.place.heeler.house/templates";
   private faction: string = "";
   currentTemplate: TemplateData | null = null;
   private lastId: string = "";

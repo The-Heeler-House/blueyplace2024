@@ -161,7 +161,7 @@ export class Minimap {
     this.settings.addSetting(
       "copyId",
       new ButtonSetting("Copy user ID", () => {
-        navigator.clipboard.writeText(localStorage.getItem("ponyplace-id") ?? "No ID found");
+        navigator.clipboard.writeText(localStorage.getItem("minimap-id") ?? "No ID found");
       })
     );
 

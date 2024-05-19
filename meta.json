@@ -2,7 +2,7 @@
   "name": "Bluey Minimap",
   "author": "Bluey Minimap Contributors",
   "description": "Minimap overlay and automatic selection of pixel + color for r/place",
-  "namespace": "https://bluey-testing.conep.one/",
+  "namespace": "https://testing.place.heeler.house/",
   "grant": [
     "GM.xmlHttpRequest",
     "GM.getValue",
@@ -12,19 +12,19 @@
   "include": [
     "https://hot-potato.reddit.com/embed*",
     "https://garlic-bread.reddit.com/embed*",
-    "https://bluey-testing.conep.one/embed*",
+    "https://testing.place.heeler.house/embed*",
     "https://reddit.com/r/place*",
     "https://www.reddit.com/r/place*",
-    "https://bluey-testing.conep.one/"
+    "https://testing.place.heeler.house/"
   ],
-  "downloadURL": "https://cdn.bluey.conep.one/scripts/loader.user.js",
-  "updateURL": "https://cdn.bluey.conep.one/scripts/loader.user.js",
+  "downloadURL": "https://cdn.place.heeler.house/scripts/loader.user.js",
+  "updateURL": "https://cdn.place.heeler.house/scripts/loader.user.js",
   "connect": [
     "raw.githubusercontent.com",
     "media.githubusercontent.com",
-    "cdn.bluey.conep.one",
-    "realtime.bluey.conep.one",
-    "api.bluey.conep.one"
+    "cdn.place.heeler.house",
+    "realtime.place.heeler.house",
+    "api.place.heeler.house"
   ],
   "version": "0.0.1"
 }
