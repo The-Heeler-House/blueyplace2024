@@ -49,22 +49,12 @@ jobs:
           type = s3
           provider = Minio
           env_auth = false
-          access_key_id = ${{ secrets.RCLONE_CONFIG_MINIO_ACCESS_KEY_ID }}
-          secret_access_key = ${{ secrets.RCLONE_CONFIG_MINIO_SECRET_ACCESS_KEY }}
-          endpoint = ${{ secrets.RCLONE_CONFIG_MINIO_ENDPOINT }}
+          access_key_id = ${{ secrets.MINIO_ACCESS_KEY_ID }}
+          secret_access_key = ${{ secrets.MINIO_SECRET_ACCESS_KEY }}
+          endpoint = cdn.bluey.conep.one
           region = us-east-1
         disable_base64: true
 
-    # creds will expire around 2024-06-16
-    #- name: Azure login
-    #  uses: azure/login@v1
-    #  with:
-    #    creds: ${{ secrets.PONYPLACE_BLOB_CREDS }}
-    
     - name: Upload to blob storage
       run: |
-        rclone -c copy ./dist "minio:minimap"
-    
-    #- name: Azure logout
-    #  run: az logout
-    #  if: always()
+        rclone -c copy ./dist "minio:scripts"
