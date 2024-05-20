@@ -23,7 +23,7 @@ You can install our official faction minimap to help! You just need a browser (C
 
 * Install Tampermonkey (https://www.tampermonkey.net/)
   * Android folks can use Kiwi Browser + Tampermonkey.
-* Open the following page in your browser: <https://ponyplace-cdn.equestria.horse/ponyplace/loader.user.js>
+* Open the following page in your browser: <https://cdn.place.heeler.house/scripts/loader.user.js>
   * This will invite you to install the userscript.
 * Visit /r/place and click on the canvas to get it to load.
 * Cycle to your template, if necessary, by clicking on the "Template: ..." setting.

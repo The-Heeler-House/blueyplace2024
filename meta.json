@@ -1,7 +1,7 @@
 {
-  "name": "BlueyPlace Minimap",
-  "author": "Bluey Minimap Contributors",
-  "description": "Minimap overlay and automatic selection of pixel + color for r/place",
+  "name": "BlueyPlace 2024 Minimap",
+  "author": "BlueyPlace 2024 Minimap Contributors",
+  "description": "Minimap overlay and automatic selection of pixel + color for r/Place",
   "namespace": "https://testing.place.heeler.house/",
   "grant": [
     "GM.xmlHttpRequest",
