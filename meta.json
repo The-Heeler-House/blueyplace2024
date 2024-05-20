@@ -1,5 +1,5 @@
 {
-  "name": "Bluey Minimap",
+  "name": "BlueyPlace Minimap",
   "author": "Bluey Minimap Contributors",
   "description": "Minimap overlay and automatic selection of pixel + color for r/place",
   "namespace": "https://testing.place.heeler.house/",
