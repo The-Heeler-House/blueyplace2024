@@ -29,13 +29,14 @@ export class Notifications {
   }
 
   addNotification(level: NotificationLevel, text: string) {
+    console.log("hello??")
     this.ui?.addNotification(level, text);
   }
 
   async initialize() {
     this.ui = createNotificationsUI(document);
 
-    this.realtime.on("notifications", (data) => this.handleNotification(data));
+    this.realtime.addEventListener("notifications", (data) => this.handleNotification(data));
 
     return true;
   }
