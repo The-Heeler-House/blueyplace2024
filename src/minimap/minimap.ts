@@ -166,12 +166,32 @@ export class Minimap {
     );
 
     this.settings.addSetting(
-      "copyPallet",
-      new ButtonSetting("Copy pallet", () => {
+      "copyPalletRGB",
+      new ButtonSetting("Copy pallet RGB", () => {
         let data: string[] = [];
 
         this.rPlace?.palette.forEach(color => {
           data.push(`{${color[0]},${color[1]},${color[2]}}`);
+        });
+
+        navigator.clipboard.writeText(`{${data.join(",")}}`);
+      })
+    );
+
+    this.settings.addSetting(
+      "copyPalletHEX",
+      new ButtonSetting("Copy pallet HEX", () => {
+        let data: string[] = [];
+
+        this.rPlace?.palette.forEach(color => {
+          var r = color[0].toString(16);
+          r = r.length == 1 ? "0" + r : r;
+          var g = color[1].toString(16);
+          g = g.length == 1 ? "0" + g : g;
+          var b = color[2].toString(16);
+          b = b.length == 1 ? "0" + b : b;
+
+          data.push(`#${r}${g}${b}`);
         });
 
         navigator.clipboard.writeText(`{${data.join(",")}}`);
