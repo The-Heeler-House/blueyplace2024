@@ -1,7 +1,7 @@
 import {getMostLikelyCanvas, getRedditCanvas, RedditCanvas } from "../canvas";
 import {fallbackOverlay, Overlay} from "../overlay";
 import {CanvasComparer} from "../canvasComparer";
-import {ButtonSetting, CheckboxSetting, DisplaySetting, Settings} from "./minimap-components";
+import {ButtonSetting, CheckboxSetting, CycleSetting, DisplaySetting, Settings} from "./minimap-components";
 import {createMinimapUI, MinimapUI} from "./minimap-ui";
 import {waitMs} from "../utils";
 import {html} from "uhtml";
@@ -87,19 +87,19 @@ export class Minimap {
     this.maskCanvas.height = this.rPlaceCanvas.height;
     this.comparer = new CanvasComparer(this.rPlaceCanvas, this.templateCanvas, this.maskCanvas);
 
-    /*this.settings.addSetting(
+    this.settings.addSetting(
       "templateName",
       new CycleSetting(
         "Template",
-        this.templates.keys,
-        0,
+        ["bluey", "bluey_allies"],
+        ["Only Bluey", "Bluey & Allies"],
+        1,
         (templateNameSetting) => {
-          this.templates.set(templateNameSetting.value);
-          this.templates.fetch(this.settings!.getSetting("autoPick").enabled);
+          this.templateController.setFaction(templateNameSetting.value);
         },
         true
       )
-    );*/
+    );
 
     this.settings.addSetting(
       "findArt",

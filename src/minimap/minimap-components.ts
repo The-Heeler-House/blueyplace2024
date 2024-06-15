@@ -56,6 +56,7 @@ export class CheckboxSetting {
 export class CycleSetting {
   name: string;
   values: Array<string>;
+  displayNames: Array<string>;
   valueIx: number;
   callback: (setting) => void;
   alwaysShow: boolean;
@@ -63,18 +64,23 @@ export class CycleSetting {
   constructor(
     name,
     values = ["Unset"],
+    displayNames = values,
     valueIx = 0,
     callback = function (setting) {},
     alwaysShow = false
   ) {
     this.name = name;
     this.values = values;
+    this.displayNames = displayNames;
     this.valueIx = valueIx;
     this.callback = callback;
     this.alwaysShow = alwaysShow;
   }
   get value() {
     return this.values[this.valueIx];
+  }
+  private get displayValue() {
+    return this.displayNames[this.valueIx];
   }
   onclick() {
     this.valueIx = (this.valueIx + 1) % this.values.length;
@@ -85,7 +91,7 @@ export class CycleSetting {
     const classes = ["clickable"];
     this.alwaysShow ? classes.push("alwaysshow") : null;
     return html.for(ref, id)`<div data-id=${id} class=${classes.join(" ")} onclick=${onclick}>
-      ${this.name}: <span>${this.value}</span>
+      ${this.name}: <span>${this.displayValue}</span>
     </div>`;
   }
 }

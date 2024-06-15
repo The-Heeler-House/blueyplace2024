@@ -24,7 +24,8 @@ mlpminimap {
   top: 0;
   right: 0;
   background-color: rgba(0,0,0,.75);
-  border: 1px solid black;
+  border: 2px solid #6b6b6b;
+  border-bottom-left-radius: 10px;
   overflow: hidden;
 }
 

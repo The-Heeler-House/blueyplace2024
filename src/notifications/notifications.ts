@@ -21,16 +21,16 @@ export class Notifications {
   }
 
   private handleNotification(data: any) {
-    if (data.level === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no notification level.");
-    if (!["low","high","critical"].includes(data.level)) return this.addNotification(NotificationLevel.High, "Received a notification with an unknown notification level.");
-    if (data.text === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no text.");
+    if (data.level === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no notification level.", new Date());
+    if (!["low","high","critical"].includes(data.level)) return this.addNotification(NotificationLevel.High, "Received a notification with an unknown notification level.", new Date());
+    if (data.text === undefined) return this.addNotification(NotificationLevel.High, "Received a notification with no text.", new Date());
 
-    this.addNotification(data.level as NotificationLevel, data.text);
+    this.addNotification(data.level as NotificationLevel, data.text, data.date == undefined ? new Date() : new Date(data.date));
   }
 
-  addNotification(level: NotificationLevel, text: string) {
+  addNotification(level: NotificationLevel, text: string, date: Date) {
     console.log("hello??")
-    this.ui?.addNotification(level, text);
+    this.ui?.addNotification(level, text, date);
   }
 
   async initialize() {

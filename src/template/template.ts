@@ -215,12 +215,16 @@ export class TemplateController extends EventEmitter {
   }
 
   setFaction(faction: string) {
+    this.mqtt!.setFaction(faction);
+  }
+
+  private _setFaction(faction: string) {
     this.faction = faction;
   }
 
   async initiate() {
     this.mqtt!.addEventListener("updates", (data: TemplateUpdate, retained: boolean) => this.onUpdate(data, retained));
-    this.mqtt!.addEventListener("faction", (faction: string) => this.setFaction(faction));
+    this.mqtt!.addEventListener("faction", (faction: string) => this._setFaction(faction));
 
     return true;
   }
@@ -246,9 +250,9 @@ interface DiffTemplateUpdate {
   type: "diff",
   previous_id: string,
   current_id: string,
-  x: number,
-  y: number,
-  raw: boolean,
+  x?: number,
+  y?: number,
+  raw?: boolean,
   diff?: string,
   resize?: TemplateResizeUpdate
 }

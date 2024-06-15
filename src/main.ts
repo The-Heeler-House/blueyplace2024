@@ -31,7 +31,7 @@ const autoPickAfterPlaceTimeout = 3000;
       localStorage.setItem("minimap-id", uuidv4());
     }
 
-    const faction = "lemmy";
+    const faction = "bluey_allies";
 
     const analytics = new Analytics(new URL('https://api.place.heeler.house/'));
     const analyticsLogger = new AnalyticsLogger(analytics);

@@ -13,7 +13,7 @@
 const htmlBlock = `<style>
 mlpnotifications {
   display: block;
-  color: white;
+  color: black;
   width: 400px;
   height: 100%;
   position: absolute;
@@ -26,25 +26,26 @@ mlpnotifications {
 
 mlpnotification {
   display: block;
-  border: 1px solid;
+  border: 2px solid;
   border-radius: 10px;
   padding: 5px;
   margin: 5px;
+  border-color: #bbbbbb;
+  background-color: rgb(255 255 255);
 }
 
 mlpnotification.critical {
-  border-color: red;
-  background-color: rgb(85 1 1 / 75%);
+  border-left-color: red;
+  border-left-width: 10px;
 }
 
 mlpnotification.high {
-  border-color: yellow;
-  background-color: rgb(85 79 1 / 75%);
+  border-left-color: yellow;
+  border-left-width: 10px;
 }
 
 mlpnotification.low {
-  border-color: black;
-  background-color: rgba(0,0,0,.75);
+  border-left-width: 10px;
 }
 
 .notification-text {
@@ -86,14 +87,14 @@ export class NotificationsUi {
     this.mlpNotificationsBlock = mlpNotificationsBlock;
   }
 
-  addNotification(level: NotificationLevel, text: string) {
+  addNotification(level: NotificationLevel, text: string, date: Date) {
     const notificationObject = document.createElement("mlpnotification");
     const closeButton = document.createElement("button");
     const notificationText = document.createElement("span");
     const notificationDate = document.createElement("span");
 
     notificationObject.classList.add(level);
-    notificationObject.setAttribute("date", new Date().toISOString());
+    notificationObject.setAttribute("date", date.toISOString());
 
     closeButton.classList.add("notification-closer");
     closeButton.type = "button";
@@ -112,6 +113,10 @@ export class NotificationsUi {
     notificationObject.appendChild(notificationDate);
 
     this.mlpNotificationsBlock.appendChild(notificationObject);
+    if (level == NotificationLevel.Critical) {
+      // @ts-ignore
+      document.getElementById("notification-critical-soundeffect")!.play();
+    }
   }
 }
 
@@ -125,6 +130,12 @@ export function createNotificationsUI(document: Document): NotificationsUi {
   const htmlObject = document.createElement("div");
   htmlObject.innerHTML = htmlBlock;
   document.querySelector("body")?.appendChild(htmlObject);
+
+  // @ts-ignore
+  GM.addElement("audio", {
+    src: "https://cdn.place.heeler.house/scripts/notification-critical.mp3",
+    id: "notification-critical-soundeffect"
+  });
 
   const mlpNotificationsBlock = htmlObject.querySelector("mlpnotifications")! as HTMLElement;
 

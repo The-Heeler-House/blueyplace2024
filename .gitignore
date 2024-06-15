@@ -7,3 +7,5 @@
 
 # Ignore krita autosave files becaue they are bugging me
 *-autosave.kra
+
+.DS_Store
