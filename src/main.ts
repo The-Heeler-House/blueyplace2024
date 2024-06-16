@@ -71,14 +71,12 @@ const autoPickAfterPlaceTimeout = 3000;
     // TODO: Fix analytics
     minimap.rPlace!.embed._events._getEventTarget().addEventListener("confirm-pixel", () => {
       const now = Date.now();
-      const reddit = now + minimap.rPlace!.embed.nextTileAvailableIn * 1000;
-      const safe = reddit + autoPickAfterPlaceTimeout;
-      analytics.placedPixel('manual-browser', faction, minimap.rPlace!.position.pos, minimap.rPlace!.embed.selectedColor, now, {
-        reddit: reddit,
-        safe: safe
-      });
+      const nextPixelPlace = now + minimap.rPlace!.embed.nextTileAvailableIn * 1000;
+      analytics.placedPixel(faction, minimap.rPlace!.position.pos, minimap.rPlace!.embed.selectedColor, new Date(now), new Date(nextPixelPlace));
+
+      console.log("submitted analytics");
     });
-    minimap.comparer!.addEventListener("computed", () => {
+    /*minimap.comparer!.addEventListener("computed", () => {
       if (Math.random() < 0.01) {
         analytics.statusUpdate(
           faction,
@@ -86,7 +84,7 @@ const autoPickAfterPlaceTimeout = 3000;
           minimap.comparer!.countOfWrongPixels
         );
       }
-    });
+    });*/
   } else {
     // Data mode. Connects to WebSockets and forwards them to the Canvas instance.
     const mqttClient = new MqttWSClient("wss://realtime.place.heeler.house");

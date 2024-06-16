@@ -33,34 +33,34 @@ export class Analytics {
     this.#uuid = localStorage.getItem("minimap-id") || null;
   }
 
-  private send(data) {
+  private send(path, data) {
+    console.log(this.#endpoint.toString() + path);
+
     GM.xmlHttpRequest({
-      url: this.#endpoint.toString(),
+      url: this.#endpoint.toString() + path,
       method: 'POST',
       data: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json"
+      },
+      onload: (res) => {
+        console.log(res);
       }
     });
   }
 
-  async placedPixel(type: string, template: string, pos: {x: number, y: number}, color: number, timestamp: number,
-                    nextPixelPlace: {reddit: number, safe: number}) {
+  async placedPixel(template: string, pos: {x: number, y: number}, color: number, timestamp: Date,
+                    nextPixelPlace: Date) {
     const data = {
-      id: this.#uuid,
-      event: 'pixel',
-      type: type,
-      template: template,
-      pos: {
-        x: pos.x,
-        y: pos.y
-      },
+      user_id: this.#uuid,
+      x: pos.x,
+      y: pos.y,
       color: color,
-      timestamp: timestamp / 1000,
-      nextPixelPlace: nextPixelPlace
+      timestamp: timestamp.toISOString(),
+      next_pixel: nextPixelPlace.toISOString()
     };
 
-    this.send(data);
+    this.send(`${template}/pixel`, data);
   }
 
   async logError(...args) {
@@ -71,7 +71,7 @@ export class Analytics {
       message: formatLog(...args)
     };
 
-    this.send(data);
+    this.send(`error`, data);
   }
 
   async statusUpdate(template: string, correctPixels: number, totalPixels: number) {
@@ -84,6 +84,6 @@ export class Analytics {
       totalPixels: totalPixels
     };
 
-    this.send(data);
+    this.send(null, data);
   }
 }
