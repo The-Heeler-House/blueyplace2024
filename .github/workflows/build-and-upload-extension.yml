@@ -42,7 +42,7 @@ jobs:
           dist
 
     - name: Update certificates
-      run: ca-certificates && update-ca-certificates 2>/dev/null || true
+      run: update-ca-certificates 2>/dev/null || true
 
     - name: Setup rclone
       uses: AnimMouse/setup-rclone@v1
