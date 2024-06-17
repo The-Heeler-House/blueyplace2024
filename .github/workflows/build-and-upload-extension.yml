@@ -42,7 +42,7 @@ jobs:
           dist
 
     - name: Update certificates
-      run: update-ca-certificates
+      run: sudo update-ca-certificates
 
     - name: Setup rclone
       uses: AnimMouse/setup-rclone@v1
